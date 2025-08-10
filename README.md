@@ -14,6 +14,16 @@ A Django-based **Bank Assistant Chatbot** using the **Retrieval-Augmented Genera
 - **Vector Database**: Stores embeddings of PDF content for efficient retrieval during query processing.
 - **RESTful API**: JSON-based endpoints for seamless interaction.
 
+---
+
+##  Demo
+
+![Demo](demo/bank_asst_gif.gif)
+
+> _A walkthrough of a project Bank Assistant Chatbot using RAG to deliver personalized responses from uploaded PDFs, with user authentication, PDF handling, and admin-level controls._
+
+---
+
 ## Tech Stack
 
 - **Backend**: Django (Python)
