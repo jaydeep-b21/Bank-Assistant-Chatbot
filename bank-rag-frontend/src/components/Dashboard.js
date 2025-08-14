@@ -6,6 +6,7 @@ export default function Dashboard({ user, setUser }) {
   const [chat, setChat] = useState([]);
   const [pdfFile, setPdfFile] = useState(null);
   const [targetUserId, setTargetUserId] = useState("");  // for admin selection
+  const [queryMode, setQueryMode] = useState("all"); // "all" or "specific" for admin
 
   const askQuestion = async () => {
     if (!question.trim()) return;
@@ -15,8 +16,13 @@ export default function Dashboard({ user, setUser }) {
 
     try {
       const payload = { question: q };
-      if (user.isAdmin && targetUserId) {
-        payload.user_id = targetUserId;
+      
+      // For admin users, handle query mode
+      if (user.isAdmin) {
+        if (queryMode === "specific" && targetUserId) {
+          payload.user_id = targetUserId;
+        }
+        // If queryMode is "all" or no targetUserId, query all users (default for admin)
       }
 
       const res = await api.post("query/", payload);
@@ -44,15 +50,16 @@ export default function Dashboard({ user, setUser }) {
         headers: { "Content-Type": "multipart/form-data" },
       });
       alert("PDF uploaded successfully!");
+      setPdfFile(null);
     } catch (err) {
       alert("Error uploading PDF");
     }
   };
 
   const logout = async () => {
-    await api.get("logout/");
+    await api.post("logout/");
     setUser(null);
-    localStorage.removeItem("user");   // ✅ clear storage
+    localStorage.removeItem("user");   //  clear storage
   };
 
   return (
@@ -81,13 +88,64 @@ export default function Dashboard({ user, setUser }) {
             value={targetUserId}
             onChange={(e) => setTargetUserId(e.target.value)}
           />
-          <input type="file" onChange={(e) => setPdfFile(e.target.files[0])} />
+          <input 
+            type="file" 
+            onChange={(e) => setPdfFile(e.target.files[0])} 
+            accept=".pdf"
+          />
           <button className="upload-btn" onClick={uploadPDF}>Upload</button>
+        </div>
+      )}
+
+      {user.isAdmin && (
+        <div className="admin-query-mode">
+          <h3>Query Mode (Admin)</h3>
+          <div className="query-mode-options">
+            <label>
+              <input
+                type="radio"
+                name="queryMode"
+                value="all"
+                checked={queryMode === "all"}
+                onChange={(e) => setQueryMode(e.target.value)}
+              />
+              Query all users' documents
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="queryMode"
+                value="specific"
+                checked={queryMode === "specific"}
+                onChange={(e) => setQueryMode(e.target.value)}
+              />
+              Query specific user
+            </label>
+          </div>
+          {queryMode === "specific" && (
+            <input
+              type="text"
+              placeholder="User ID to query"
+              value={targetUserId}
+              onChange={(e) => setTargetUserId(e.target.value)}
+              style={{ marginTop: "10px" }}
+            />
+          )}
         </div>
       )}
 
       <div className="chat-container">
         <h3>Chat Here</h3>
+        {user.isAdmin && (
+          <p className="query-info">
+            {queryMode === "all" 
+              ? "Querying across all users' documents" 
+              : queryMode === "specific" && targetUserId 
+                ? `Querying user ID: ${targetUserId}` 
+                : "Select query mode above"}
+          </p>
+        )}
+        
         <div className="chat-messages">
           {chat.map((msg, i) => (
             <div
