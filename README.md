@@ -71,8 +71,8 @@ bank-rag/
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/your-username/bank-assistant-chatbot.git
-   cd bank-assistant-chatbot
+   https://github.com/jaydeep-b21/Bank-Assistant-Chatbot.git
+   cd Bank-Assistant-Chatbot
    ```
 
 2. **Create a Virtual Environment**
